@@ -1,10 +1,14 @@
 import { StyleSheet, Text, View, TouchableHighlight, Modal } from 'react-native'
 
 export const FloatingButton = (props) => {
+  const handlePress = () => {
+    props.setShowMenu(true)
+  }
+
   return (
-    <View style={styles.container}>
+    <TouchableHighlight style={styles.container} onPress={handlePress}>
       <Text style={styles.threeDots}>+</Text>
-    </View>
+    </TouchableHighlight>
   )
 }
 

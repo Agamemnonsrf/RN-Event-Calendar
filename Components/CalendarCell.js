@@ -55,7 +55,7 @@ export const CalendarCell = (props) => {
 const styles = StyleSheet.create({
   container: {
     height: 50,
-    width: 39,
+    width: 42,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

@@ -44,7 +44,7 @@ export const Month = (props) => {
 const styles = StyleSheet.create({
   container: {
     height: 'auto',
-    width: 320,
+    width: 340,
     borderColor: 'black',
     borderWidth: 1,
     margin: 10,
