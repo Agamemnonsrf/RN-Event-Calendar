@@ -9,7 +9,7 @@ import PenToSquareSolid from './pen-to-square-solid.svg'
 import StarSolid from './star-solid.svg'
 import TreeSolid from './tree-solid.svg'
 
-export {
+const stickers = [
   BarsSolid,
   BombSolid,
   CodeSolid,
@@ -20,4 +20,6 @@ export {
   PenToSquareSolid,
   StarSolid,
   TreeSolid,
-}
+]
+
+export { stickers }

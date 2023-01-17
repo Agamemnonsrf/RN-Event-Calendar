@@ -7,165 +7,107 @@ import {
   TouchableHighlight,
   FlatList,
   ScrollView,
+  TextInput,
 } from 'react-native'
 import { Calendar } from './Components/Calendar'
 import { FloatingButton } from './Components/FloatingButton'
 import { useState } from 'react'
-import {
-  BarsSolid,
-  BombSolid,
-  CodeSolid,
-  DumbbellSolid,
-  HeartSolid,
-  HouseSolid,
-  PaperClipSolid,
-  PenToSquareSolid,
-  StarSolid,
-  TreeSolid,
-} from './icons/exports'
+import { stickers } from './icons/exports'
 import { StickerSelect } from './Components/StickerSelect'
+import MenuDrawer from 'react-native-side-drawer'
 
 export default function App() {
   const [showMenu, setShowMenu] = useState(false)
   const [stickerList, setStickerList] = useState([])
-  const [showStickerStore, setShowStickerStore] = useState(false)
-
-  console.warn(stickerList)
 
   const renderStickerLine = ({ item }) => {
+    const Sticker = stickers[item]
     return (
       <View style={styles.stickeLine}>
-        <Text>{item}</Text>
+        <Sticker height={30} width={30} />
+        <TextInput
+          style={styles.stickerInput}
+          placeholder="Set Sticker Name..."
+        />
       </View>
     )
   }
 
-  return (
-    <View style={styles.container}>
-      <StatusBar style="light" translucent={false} />
-      <Calendar />
-      <FloatingButton showMenu={showMenu} setShowMenu={setShowMenu} />
-      {showMenu && (
-        <View style={{ position: 'absolute' }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <View style={styles.textandlist}>
-                <Text style={styles.modalText}>Your Stickers</Text>
-                <View
-                  style={{
-                    borderWidth: 1,
-                    borderColor: 'grey',
-                    height: 300,
-                    width: 250,
-                  }}
-                >
-                  <FlatList data={stickerList} renderItem={renderStickerLine} />
-                </View>
-              </View>
-              <TouchableHighlight onPress={() => setShowStickerStore(true)}>
-                <View style={styles.addButton}>
-                  <Text style={styles.addButtonText}>+</Text>
-                </View>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setShowMenu(!showMenu)}
-              >
-                <Text style={styles.textStyle}>X</Text>
-              </TouchableHighlight>
-            </View>
-          </View>
-          {showStickerStore && (
-            <View style={{ position: 'absolute' }}>
-              <View style={styles.centeredView}>
-                <View style={styles.modalView2}>
-                  <ScrollView
-                    style={styles.scrollView}
-                    contentContainerStyle={styles.containerStyles}
-                  >
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="BarsSolid"
-                    >
-                      <BarsSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="BombSolid"
-                    >
-                      <BombSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="CodeSolid"
-                    >
-                      <CodeSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="DumbbellSolid"
-                    >
-                      <DumbbellSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="HeartSolid"
-                    >
-                      <HeartSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="HouseSolid"
-                    >
-                      <HouseSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="PaperClipSolid"
-                    >
-                      <PaperClipSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="PenToSquareSolid"
-                    >
-                      <PenToSquareSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="StarSolid"
-                    >
-                      <StarSolid width={40} height={40} />
-                    </StickerSelect>
-                    <StickerSelect
-                      setStickerList={setStickerList}
-                      value="TreeSolid"
-                    >
-                      <TreeSolid width={40} height={40} />
-                    </StickerSelect>
-                  </ScrollView>
-                  <TouchableHighlight
-                    style={[styles.button, styles.buttonClose]}
-                    onPress={() => setShowStickerStore(false)}
-                  >
-                    <Text style={styles.textStyle}>X</Text>
-                  </TouchableHighlight>
-                  <TouchableHighlight
-                    onPress={() => {
-                      setShowStickerStore(false)
-                    }}
-                  >
-                    <View style={styles.doneButton}>
-                      <Text>Done</Text>
-                    </View>
-                  </TouchableHighlight>
-                </View>
-              </View>
-            </View>
-          )}
+  const drawerContent = (
+    <View style={styles.sideMenu}>
+      <View style={styles.textandlist}>
+        <Text style={styles.modalText}>Your Stickers</Text>
+        <View
+          style={{
+            borderWidth: 1,
+            borderColor: 'grey',
+            height: 300,
+            width: 250,
+          }}
+        >
+          <FlatList data={stickerList} renderItem={renderStickerLine} />
         </View>
-      )}
+      </View>
+      <View
+        style={{
+          marginLeft: 2,
+          borderWidth: 1,
+          borderColor: 'grey',
+          height: 230,
+          width: 250,
+          marginTop: 10,
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView2}>
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.containerStyles}
+            >
+              {Object.keys(stickers).map((key) => {
+                const Sticker = stickers[key]
+                return (
+                  <StickerSelect
+                    setStickerList={setStickerList}
+                    value={key}
+                    key={key}
+                  >
+                    <Sticker width={40} height={40} />
+                  </StickerSelect>
+                )
+              })}
+            </ScrollView>
+          </View>
+        </View>
+      </View>
+      <TouchableHighlight
+        style={[styles.button, styles.buttonClose]}
+        onPress={() => setShowMenu(!showMenu)}
+      >
+        <Text style={styles.textStyle}>X</Text>
+      </TouchableHighlight>
     </View>
+  )
+
+  return (
+    <KeyboardAvoidingView>
+      <View style={styles.container}>
+        <StatusBar style="light" translucent={false} />
+        <Calendar />
+        <FloatingButton showMenu={showMenu} setShowMenu={setShowMenu} />
+        <MenuDrawer
+          open={showMenu}
+          drawerContent={drawerContent}
+          drawerPercentage={80}
+          animationTime={250}
+          overlay={true}
+        >
+          <View style={styles.container}>
+            <Text>Open Drawer</Text>
+          </View>
+        </MenuDrawer>
+      </View>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -188,22 +130,24 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 7,
   },
-
+  sideMenu: {
+    backgroundColor: 'rgba(100,100,100,1)',
+    borderRadius: 10,
+    padding: 10,
+    margin: 7,
+    height: '100%',
+  },
   containerStyles: {
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   scrollView: {
-    maxHeight: 350,
+    maxHeight: 228,
     width: 230,
   },
   textandlist: {
-    position: 'absolute',
-    top: 10,
-    left: 0,
-    right: 20,
-
+    backgroundColor: 'rgba(100,100,100)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -216,11 +160,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
   },
   modalView: {
     backgroundColor: 'rgba(50,50,50,1)',
-    borderRadius: 20,
     paddingVertical: 240,
     paddingHorizontal: 150,
     alignItems: 'center',
@@ -234,19 +176,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modalView2: {
-    backgroundColor: 'rgba(55,55,55,1)',
-    borderRadius: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 50,
+    paddingHorizontal: 10,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
   button: {
     borderRadius: 20,
@@ -292,9 +223,21 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   stickeLine: {
-    height: 50,
+    height: 60,
     width: 'auto',
-    backgroundColor: 'red',
+    backgroundColor: 'rgba(120,120,120,0.9)',
     margin: 5,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 3,
+  },
+  stickerInput: {
+    height: 40,
+    width: '80%',
+    backgroundColor: 'rgba(90,90,90,1)',
+    borderRadius: 10,
+    padding: 10,
+    margin: 7,
   },
 })

@@ -40,7 +40,7 @@ export const StickerSelect = ({ children, value, setStickerList }) => {
 
 const styles = StyleSheet.create({
   sticker: {
-    backgroundColor: 'rgba(100,100,100,0.9)',
+    backgroundColor: 'rgba(80,80,80,0.9)',
     borderRadius: 10,
     padding: 10,
     margin: 7,
