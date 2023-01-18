@@ -39,6 +39,7 @@ export const Calendar = () => {
         renderItem={renderMonth}
         data={months}
         ListHeaderComponent={renderYear}
+        keyExtractor={(item) => item.monthKey.toString()}
       />
     </View>
   )

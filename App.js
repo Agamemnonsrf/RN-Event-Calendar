@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
   TextInput,
+  KeyboardAvoidingView,
 } from 'react-native'
 import { Calendar } from './Components/Calendar'
 import { FloatingButton } from './Components/FloatingButton'
@@ -15,6 +16,7 @@ import { useState } from 'react'
 import { stickers } from './icons/exports'
 import { StickerSelect } from './Components/StickerSelect'
 import MenuDrawer from 'react-native-side-drawer'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default function App() {
   const [showMenu, setShowMenu] = useState(false)
@@ -35,19 +37,7 @@ export default function App() {
 
   const drawerContent = (
     <View style={styles.sideMenu}>
-      <View style={styles.textandlist}>
-        <Text style={styles.modalText}>Your Stickers</Text>
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: 'grey',
-            height: 300,
-            width: 250,
-          }}
-        >
-          <FlatList data={stickerList} renderItem={renderStickerLine} />
-        </View>
-      </View>
+      <Text style={styles.modalText}>Your Stickers</Text>
       <View
         style={{
           marginLeft: 2,
@@ -55,7 +45,7 @@ export default function App() {
           borderColor: 'grey',
           height: 230,
           width: 250,
-          marginTop: 10,
+          marginBottom: 20,
         }}
       >
         <View style={styles.centeredView}>
@@ -80,6 +70,23 @@ export default function App() {
           </View>
         </View>
       </View>
+      <View style={styles.textandlist}>
+        <View
+          style={{
+            borderWidth: 1,
+            borderColor: 'grey',
+            height: 300,
+            width: 250,
+          }}
+        >
+          <FlatList
+            data={stickerList}
+            renderItem={renderStickerLine}
+            keyExtractor={(item) => item}
+            keyboardDismissMode="on-drag"
+          />
+        </View>
+      </View>
       <TouchableHighlight
         style={[styles.button, styles.buttonClose]}
         onPress={() => setShowMenu(!showMenu)}
@@ -90,24 +97,22 @@ export default function App() {
   )
 
   return (
-    <KeyboardAvoidingView>
-      <View style={styles.container}>
-        <StatusBar style="light" translucent={false} />
-        <Calendar />
-        <FloatingButton showMenu={showMenu} setShowMenu={setShowMenu} />
-        <MenuDrawer
-          open={showMenu}
-          drawerContent={drawerContent}
-          drawerPercentage={80}
-          animationTime={250}
-          overlay={true}
-        >
-          <View style={styles.container}>
-            <Text>Open Drawer</Text>
-          </View>
-        </MenuDrawer>
-      </View>
-    </KeyboardAvoidingView>
+    <View style={styles.container}>
+      <StatusBar style="light" translucent={false} />
+      <Calendar />
+      <FloatingButton showMenu={showMenu} setShowMenu={setShowMenu} />
+
+      <MenuDrawer
+        open={showMenu}
+        drawerContent={drawerContent}
+        drawerPercentage={80}
+        animationTime={250}
+      >
+        <View style={styles.container}>
+          <Text>Open Drawer</Text>
+        </View>
+      </MenuDrawer>
+    </View>
   )
 }
 
