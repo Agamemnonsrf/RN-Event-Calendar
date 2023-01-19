@@ -7,17 +7,28 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native'
+import * as SQLite from 'expo-sqlite'
 
 import { useState, useEffect } from 'react'
 
 export const StickerSelect = ({ children, value, setStickerList }) => {
   const [isSelected, setIsSelected] = useState(false)
+  const db = SQLite.openDatabase('db.db')
 
   useEffect(() => {
     if (isSelected) {
-      setStickerList((prev) => [...prev, value])
+      setStickerList((prev) => [...prev, { value: value, name: '' }])
+      db.transaction((tx) => {
+        tx.executeSql(`insert into stickers (name, sticker) values (?, ?)`, [
+          '',
+          value,
+        ])
+      })
     } else {
-      setStickerList((prev) => prev.filter((item) => item !== value))
+      setStickerList((prev) => prev.filter((item) => item.value !== value))
+      db.transaction((tx) => {
+        tx.executeSql(`delete from stickers where sticker = ?`, [value])
+      })
     }
   }, [isSelected])
 

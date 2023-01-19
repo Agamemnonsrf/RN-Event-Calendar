@@ -12,24 +12,54 @@ import {
 } from 'react-native'
 import { Calendar } from './Components/Calendar'
 import { FloatingButton } from './Components/FloatingButton'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { stickers } from './icons/exports'
 import { StickerSelect } from './Components/StickerSelect'
 import MenuDrawer from 'react-native-side-drawer'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import * as SQLite from 'expo-sqlite'
 
 export default function App() {
   const [showMenu, setShowMenu] = useState(false)
   const [stickerList, setStickerList] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const db = SQLite.openDatabase('db.db')
+
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'create table if not exists stickers (id integer primary key not null, name text, sticker text);',
+      )
+    })
+
+    updateList()
+  }, [])
+
+  const updateList = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'select sticker from stickers',
+        [],
+        (_, result) => setStickerList(result.rows._array),
+        (_, error) => console.log(error),
+      )
+    })
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    console.log('hello')
+    console.log(stickerList)
+  }, [stickerList])
 
   const renderStickerLine = ({ item }) => {
-    const Sticker = stickers[item]
+    const Sticker = stickers[item.value]
     return (
       <View style={styles.stickeLine}>
         <Sticker height={30} width={30} />
         <TextInput
           style={styles.stickerInput}
           placeholder="Set Sticker Name..."
+          value={item.name}
         />
       </View>
     )
@@ -79,12 +109,16 @@ export default function App() {
             width: 250,
           }}
         >
-          <FlatList
-            data={stickerList}
-            renderItem={renderStickerLine}
-            keyExtractor={(item) => item}
-            keyboardDismissMode="on-drag"
-          />
+          {isLoading ? (
+            <Text>Loading...</Text>
+          ) : (
+            <FlatList
+              data={stickerList}
+              renderItem={renderStickerLine}
+              keyExtractor={(item) => item}
+              keyboardDismissMode="on-drag"
+            />
+          )}
         </View>
       </View>
       <TouchableHighlight
