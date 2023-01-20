@@ -11,23 +11,33 @@ import * as SQLite from 'expo-sqlite'
 
 import { useState, useEffect } from 'react'
 
-export const StickerSelect = ({ children, value, setStickerList }) => {
+export const StickerSelect = ({ children, value, setStickerList, db }) => {
   const [isSelected, setIsSelected] = useState(false)
-  const db = SQLite.openDatabase('db.db')
 
   useEffect(() => {
     if (isSelected) {
-      setStickerList((prev) => [...prev, { value: value, name: '' }])
       db.transaction((tx) => {
-        tx.executeSql(`insert into stickers (name, sticker) values (?, ?)`, [
-          '',
-          value,
-        ])
+        tx.executeSql(
+          `insert into stickers (id, name) values (?, ?)`,
+          [value, ''],
+          (_, result) => {
+            console.log(`result.rowsAffected: ${result.rowsAffected}`)
+            setStickerList((prev) => [...prev, { value: value, name: '' }])
+          },
+          (_, error) => console.log(`error: ${error}`),
+        )
       })
     } else {
-      setStickerList((prev) => prev.filter((item) => item.value !== value))
       db.transaction((tx) => {
-        tx.executeSql(`delete from stickers where sticker = ?`, [value])
+        tx.executeSql(
+          `delete from stickers where id = ?`,
+          [value],
+          (_, result) => {
+            setStickerList((prev) =>
+              prev.filter((item) => item.value !== value),
+            )
+          },
+        )
       })
     }
   }, [isSelected])

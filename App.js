@@ -19,37 +19,39 @@ import MenuDrawer from 'react-native-side-drawer'
 import * as SQLite from 'expo-sqlite'
 
 export default function App() {
+  const [db, setDb] = useState(SQLite.openDatabase('example.db'))
+  const [isLoading, setIsLoading] = useState(true)
+
   const [showMenu, setShowMenu] = useState(false)
   const [stickerList, setStickerList] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const db = SQLite.openDatabase('db.db')
 
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
-        'create table if not exists stickers (id integer primary key not null, name text, sticker text);',
+        'CREATE TABLE IF NOT EXISTS stickers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)',
+        null,
+        (txObj, resultSet) => {
+          console.log(`resultSet: ${JSON.stringify(resultSet)}`)
+        },
+        (txObj, error) => console.log(`error: ${JSON.stringify(error)}`),
       )
     })
 
-    updateList()
-  }, [])
-
-  const updateList = () => {
     db.transaction((tx) => {
       tx.executeSql(
-        'select sticker from stickers',
-        [],
-        (_, result) => setStickerList(result.rows._array),
-        (_, error) => console.log(error),
+        'select * from stickers',
+        null,
+        (txObj, resultSet) => {
+          console.log(
+            `resultSet.rows._array: ${JSON.stringify(resultSet.rows._array)}`,
+          )
+        },
+        (txObj, error) => console.log(`error: ${JSON.stringify(error)}`),
       )
     })
+
     setIsLoading(false)
-  }
-
-  useEffect(() => {
-    console.log('hello')
-    console.log(stickerList)
-  }, [stickerList])
+  }, [db])
 
   const renderStickerLine = ({ item }) => {
     const Sticker = stickers[item.value]
@@ -84,18 +86,19 @@ export default function App() {
               style={styles.scrollView}
               contentContainerStyle={styles.containerStyles}
             >
-              {Object.keys(stickers).map((key) => {
+              {/* {Object.keys(stickers).map((key) => {
                 const Sticker = stickers[key]
                 return (
-                  <StickerSelect
-                    setStickerList={setStickerList}
-                    value={key}
-                    key={key}
-                  >
-                    <Sticker width={40} height={40} />
-                  </StickerSelect>
+                  // <StickerSelect
+                  //   setStickerList={setStickerList}
+                  //   value={key}
+                  //   key={key}
+                  //   db={db}
+                  // >
+                  // </StickerSelect>
+                  <Sticker width={40} height={40} key={key} />
                 )
-              })}
+              })} */}
             </ScrollView>
           </View>
         </View>
@@ -135,17 +138,13 @@ export default function App() {
       <StatusBar style="light" translucent={false} />
       <Calendar />
       <FloatingButton showMenu={showMenu} setShowMenu={setShowMenu} />
-
+      {/* 
       <MenuDrawer
         open={showMenu}
         drawerContent={drawerContent}
         drawerPercentage={80}
         animationTime={250}
-      >
-        <View style={styles.container}>
-          <Text>Open Drawer</Text>
-        </View>
-      </MenuDrawer>
+      ></MenuDrawer> */}
     </View>
   )
 }
