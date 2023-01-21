@@ -11,50 +11,46 @@ import * as SQLite from 'expo-sqlite'
 
 import { useState, useEffect } from 'react'
 
-export const StickerSelect = ({ children, value, setStickerList, db }) => {
-  const [isSelected, setIsSelected] = useState(false)
+export const StickerSelect = ({
+  children,
+  value,
+  setStickerList,
+  db,
+  stickerList,
+}) => {
+  const [wasSelected, setWasSelected] = useState(false)
 
-  useEffect(() => {
-    if (isSelected) {
+  const handleAddSticker = () => {
+    if (db) {
       db.transaction((tx) => {
         tx.executeSql(
-          `insert into stickers (id, name) values (?, ?)`,
+          `insert into stickers (value, name) values (?, ?)`,
           [value, ''],
           (_, result) => {
-            console.log(`result.rowsAffected: ${result.rowsAffected}`)
-            setStickerList((prev) => [...prev, { value: value, name: '' }])
+            console.log(`result.rowsAffected on insert: ${result.rowsAffected}`)
+            setStickerList((prev) => [...prev, value])
+            setWasSelected(true)
           },
           (_, error) => console.log(`error: ${error}`),
         )
       })
-    } else {
-      db.transaction((tx) => {
-        tx.executeSql(
-          `delete from stickers where id = ?`,
-          [value],
-          (_, result) => {
-            setStickerList((prev) =>
-              prev.filter((item) => item.value !== value),
-            )
-          },
-        )
-      })
     }
-  }, [isSelected])
+  }
 
   return (
     <TouchableHighlight
-      style={styles.sticker}
-      onPress={() => setIsSelected(!isSelected)}
+      style={[
+        styles.sticker,
+        { opacity: stickerList.includes(+value) || wasSelected ? 0.5 : 1 },
+      ]}
+      disabled={stickerList.includes(+value) || wasSelected}
+      onPress={() => {
+        if (!stickerList.includes(+value) && !wasSelected) {
+          handleAddSticker()
+        }
+      }}
     >
-      <View>
-        {isSelected && (
-          <View style={styles.checkMark}>
-            <Text>V</Text>
-          </View>
-        )}
-        {children}
-      </View>
+      <View>{children}</View>
     </TouchableHighlight>
   )
 }

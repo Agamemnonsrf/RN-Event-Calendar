@@ -8,6 +8,7 @@ import PaperClipSolid from './paperclip-solid.svg'
 import PenToSquareSolid from './pen-to-square-solid.svg'
 import StarSolid from './star-solid.svg'
 import TreeSolid from './tree-solid.svg'
+import TrashSolid from './trash-solid.svg'
 
 const stickers = [
   BarsSolid,
@@ -22,4 +23,6 @@ const stickers = [
   TreeSolid,
 ]
 
-export { stickers }
+const utilStickers = [TrashSolid]
+
+export { stickers, utilStickers }
