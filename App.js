@@ -1,4 +1,4 @@
-import { StatusBar } from 'expo-status-bar'
+import { StatusBar } from "expo-status-bar";
 import {
   Modal,
   StyleSheet,
@@ -11,102 +11,168 @@ import {
   KeyboardAvoidingView,
   Button,
   Touchable,
-} from 'react-native'
-import { Calendar } from './Components/Calendar'
-import { FloatingButton } from './Components/FloatingButton'
-import { useEffect, useState } from 'react'
-import { stickers, utilStickers } from './icons/exports'
-import TrashSolid from './icons/trash-solid.svg'
-import { StickerSelect } from './Components/StickerSelect'
-import MenuDrawer from 'react-native-side-drawer'
-import * as SQLite from 'expo-sqlite'
+} from "react-native";
+import { Calendar } from "./Components/Calendar";
+import { FloatingButton } from "./Components/FloatingButton";
+import { useEffect, useState } from "react";
+
+import { StickerSelect } from "./Components/StickerSelect";
+import MenuDrawer from "react-native-side-drawer";
+import * as SQLite from "expo-sqlite";
+import { MaterialCommunityIcons } from "react-native-vector-icons";
+
+const stickerNames = [
+  "weight-lifter",
+  "abacus",
+  "account-group",
+  "air-horn",
+  "airballoon",
+  "alarm",
+  "alert",
+  "alien",
+  "all-inclusive",
+  "anvil",
+  "arm-flex",
+  "attachment",
+  "badminton",
+  "alpha-a",
+  "alpha-b",
+  "alpha-c",
+  "alpha-d",
+  "alpha-e",
+  "alpha-f",
+  "alpha-g",
+  "alpha-h",
+  "alpha-i",
+  "alpha-j",
+  "alpha-k",
+  "alpha-l",
+  "alpha-m",
+  "alpha-n",
+  "alpha-o",
+  "alpha-p",
+  "alpha-q",
+  "alpha-r",
+  "alpha-s",
+  "alpha-t",
+  "alpha-u",
+  "alpha-v",
+  "alpha-w",
+  "alpha-x",
+  "alpha-y",
+  "alpha-z",
+];
 
 export default function App() {
-  const [db, setDb] = useState(SQLite.openDatabase('octs.db'))
-  const [isLoading, setIsLoading] = useState(true)
-  const [showMenu, setShowMenu] = useState(false)
-  const [stickerList, setStickerList] = useState([])
+  const [db, setDb] = useState(SQLite.openDatabase("nines.db"));
+  const [isLoading, setIsLoading] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
+  const [stickerList, setStickerList] = useState([]);
 
   useEffect(() => {
     if (db) {
       db.transaction((tx) => {
         tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS stickers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, value INT)',
+          "CREATE TABLE IF NOT EXISTS userstickers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, value TEXT)",
           null,
           (txObj, resultSet) => {
-            console.log(`resultSet: ${JSON.stringify(resultSet)}`)
+            console.log(`resultSet: ${JSON.stringify(resultSet)}`);
           },
-          (txObj, error) => console.log(`error: ${JSON.stringify(error)}`),
-        )
-      })
-      console.log(`not completed`)
+          (txObj, error) => console.log(`error: ${JSON.stringify(error)}`)
+        );
+      });
+      console.log(`not completed`);
 
       db.transaction((tx) => {
         tx.executeSql(
-          'select distinct value from stickers',
+          "select distinct value from userstickers",
           null,
           (txObj, resultSet) => {
             console.log(
-              `resultSet.rows._array: ${JSON.stringify(resultSet.rows._array)}`,
-            )
-            setStickerList(resultSet.rows._array.map((thing) => thing.value))
+              `resultSet.rows._array: ${JSON.stringify(resultSet.rows._array)}`
+            );
+            setStickerList(resultSet.rows._array.map((thing) => thing.value));
           },
-          (txObj, error) => console.log(`error: ${JSON.stringify(error)}`),
-        )
-      })
+          (txObj, error) => console.log(`error: ${JSON.stringify(error)}`)
+        );
+      });
 
-      setIsLoading(false)
+      setIsLoading(false);
     } else {
-      console.log(`db isnt working: ${db}`)
+      console.log(`db isnt working: ${db}`);
     }
-  }, [db])
+  }, [db]);
 
   const handleDeleteSticker = (val) => {
     if (db) {
       db.transaction((tx) => {
         tx.executeSql(
-          `delete from stickers where value = ?`,
+          `delete from userstickers where value = ?`,
           [val],
           (_, result) => {
-            console.log(`result.rowsAffected on delete: ${result.rowsAffected}`)
-            setStickerList((prev) => prev.filter((item) => item !== +val))
-          },
-        )
-      })
+            console.log(
+              `result.rowsAffected on delete: ${result.rowsAffected}`
+            );
+            setStickerList((prev) => prev.filter((item) => item !== val));
+          }
+        );
+      });
     }
-  }
+  };
 
   const renderStickerLine = ({ item }) => {
-    const Sticker = stickers[item]
     return (
       <View style={styles.stickeLine}>
-        <Sticker height={30} width={30} />
+        <MaterialCommunityIcons name={item} size={30} />
         <TextInput
           style={styles.stickerInput}
           placeholder="Set Sticker Name..."
         />
         <TouchableHighlight
+          underlayColor="rgba(150,150,150,0.6)"
           style={{
-            backgroundColor: 'rgba(100,100,100,0.8)',
+            backgroundColor: "rgba(100,100,100,0.8)",
             padding: 5,
             borderRadius: 90,
           }}
           onPress={() => handleDeleteSticker(item)}
         >
-          <TrashSolid height={20} width={20} fill={'rgba(0,0,0,1)'} />
+          <MaterialCommunityIcons
+            name="trash-can"
+            size={20}
+            color={"rgba(0,0,0,1)"}
+          />
         </TouchableHighlight>
       </View>
-    )
-  }
+    );
+  };
 
   const drawerContent = (
     <View style={styles.sideMenu}>
-      <Text style={styles.modalText}>Your Stickers</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Text style={styles.modalText}>Your Stickers</Text>
+        <TouchableHighlight
+          underlayColor="rgba(150,150,150,0.6)"
+          style={[
+            { padding: 5, borderRadius: 90, marginBottom: 7 },
+            styles.buttonClose,
+          ]}
+          onPress={() => setShowMenu(!showMenu)}
+        >
+          <MaterialCommunityIcons name="close" size={20} color="white" />
+        </TouchableHighlight>
+      </View>
       <View
         style={{
           marginLeft: 2,
           borderWidth: 1,
-          borderColor: 'grey',
+          borderColor: "grey",
           height: 230,
           width: 250,
           marginBottom: 20,
@@ -118,8 +184,7 @@ export default function App() {
               style={styles.scrollView}
               contentContainerStyle={styles.containerStyles}
             >
-              {Object.keys(stickers).map((key) => {
-                const Sticker = stickers[key]
+              {stickerNames.map((key) => {
                 return (
                   <StickerSelect
                     setStickerList={setStickerList}
@@ -128,9 +193,9 @@ export default function App() {
                     db={db}
                     stickerList={stickerList}
                   >
-                    <Sticker width={40} height={40} key={key} />
+                    <MaterialCommunityIcons name={key} size={40} key={key} />
                   </StickerSelect>
-                )
+                );
               })}
             </ScrollView>
           </View>
@@ -140,7 +205,7 @@ export default function App() {
         <View
           style={{
             borderWidth: 1,
-            borderColor: 'grey',
+            borderColor: "grey",
             height: 300,
             width: 250,
           }}
@@ -157,20 +222,17 @@ export default function App() {
           )}
         </View>
       </View>
-
-      <TouchableHighlight
-        style={[styles.button, styles.buttonClose]}
-        onPress={() => setShowMenu(!showMenu)}
-      >
-        <Text style={styles.textStyle}>X</Text>
-      </TouchableHighlight>
     </View>
-  )
+  );
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" translucent={false} />
-      <Calendar />
+      <Calendar
+        stickerList={stickerList}
+        db={db}
+        underlayColor="rgba(150,150,150,0.6)"
+      />
       <FloatingButton showMenu={showMenu} setShowMenu={setShowMenu} />
 
       <MenuDrawer
@@ -180,65 +242,65 @@ export default function App() {
         animationTime={250}
       ></MenuDrawer>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(50,50,50,0.9)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(50,50,50,0.9)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   sticker: {
-    backgroundColor: 'rgba(100,100,100,0.9)',
+    backgroundColor: "rgba(100,100,100,0.9)",
     borderRadius: 10,
     padding: 10,
     margin: 7,
   },
   doneButton: {
-    backgroundColor: 'rgba(100,100,100,0.9)',
+    backgroundColor: "rgba(100,100,100,0.9)",
     borderRadius: 10,
     padding: 10,
     margin: 7,
   },
   sideMenu: {
-    backgroundColor: 'rgba(100,100,100,1)',
+    backgroundColor: "rgba(100,100,100,1)",
     borderRadius: 10,
     padding: 10,
     margin: 7,
-    height: '100%',
+    height: "100%",
   },
   containerStyles: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   scrollView: {
     maxHeight: 228,
     width: 230,
   },
   textandlist: {
-    backgroundColor: 'rgba(100,100,100)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(100,100,100)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     height: 100,
-    width: '100%',
-    backgroundColor: 'red',
+    width: "100%",
+    backgroundColor: "red",
   },
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalView: {
-    backgroundColor: 'rgba(50,50,50,1)',
+    backgroundColor: "rgba(50,50,50,1)",
     paddingVertical: 240,
     paddingHorizontal: 150,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -249,67 +311,67 @@ const styles = StyleSheet.create({
   },
   modalView2: {
     paddingHorizontal: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   button: {
     borderRadius: 20,
     padding: 10,
     elevation: 2,
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     right: 0,
     margin: 10,
   },
   buttonOpen: {
-    backgroundColor: '#F194FF',
+    backgroundColor: "#F194FF",
   },
   buttonClose: {
-    backgroundColor: '#2196F3',
+    backgroundColor: "#2196F3",
   },
   textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   modalText: {
     marginBottom: 15,
-    textAlign: 'center',
-    color: 'white',
+    textAlign: "center",
+    color: "white",
     fontSize: 30,
   },
   addButton: {
-    backgroundColor: 'grey',
+    backgroundColor: "grey",
     width: 50,
     height: 50,
     borderRadius: 25,
-    position: 'absolute',
+    position: "absolute",
     top: 160,
     left: 60,
   },
   addButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    textAlignVertical: 'center',
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+    textAlignVertical: "center",
     fontSize: 30,
     marginTop: 3,
   },
   stickeLine: {
     height: 60,
-    width: 'auto',
-    backgroundColor: 'rgba(120,120,120,0.9)',
+    width: "auto",
+    backgroundColor: "rgba(120,120,120,0.9)",
     margin: 5,
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 3,
   },
   stickerInput: {
     height: 40,
-    width: '65%',
-    backgroundColor: 'rgba(90,90,90,1)',
+    width: "65%",
+    backgroundColor: "rgba(90,90,90,1)",
     borderRadius: 10,
     padding: 10,
     margin: 7,
   },
-})
+});

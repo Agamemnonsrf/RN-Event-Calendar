@@ -1,18 +1,60 @@
-import { StyleSheet, Text, View, TouchableHighlight, Modal } from 'react-native'
-import { useState, useEffect } from 'react'
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableHighlight,
+  Modal,
+  FlatList,
+  TextInput,
+} from "react-native";
+import { useState, useEffect } from "react";
+import { MaterialCommunityIcons } from "react-native-vector-icons";
 
 export const CalendarCell = (props) => {
-  const [isToday, setIsToday] = useState(false)
-  const [isSelected, setIsSelected] = useState(false)
+  const [isToday, setIsToday] = useState(false);
+  const [currentSticker, setCurrentSticker] = useState(null);
+  const [isLongPressed, setIsLongPressed] = useState(false);
 
   useEffect(() => {
-    const today = new Date()
-    const day = today.getDate()
-    const month = today.getMonth() + 1
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.getMonth() + 1;
     if (month == props.monthKey && day == props.day) {
-      setIsToday(true)
+      setIsToday(true);
     }
-  }, [])
+  }, []);
+
+  const handleSelectSticker = (item) => {
+    currentSticker === item ? setCurrentSticker(null) : setCurrentSticker(item);
+    setIsLongPressed(false);
+  };
+
+  const renderStickerListItem = ({ item }) => {
+    return (
+      <View
+        style={{
+          width: 50,
+          height: 50,
+          backgroundColor:
+            currentSticker === item
+              ? "rgba(241, 201, 22,0.5)"
+              : "rgba(100,100,100,0.5)",
+          borderRadius: 10,
+          padding: 10,
+          marginHorizontal: 7,
+          marginBottom: 5,
+        }}
+      >
+        <TouchableHighlight
+          onPress={() => handleSelectSticker(item)}
+          underlayColor="rgba(150,150,150,0.6)"
+          style={{ borderRadius: 10 }}
+        >
+          <MaterialCommunityIcons name={item} size={30} color="rgba(0,0,0,1)" />
+        </TouchableHighlight>
+      </View>
+    );
+  };
 
   return (
     <View>
@@ -20,70 +62,121 @@ export const CalendarCell = (props) => {
         style={[
           styles.container,
           {
-            backgroundColor: isToday ? 'rgba(150,10,25,0.7)' : 'grey',
+            backgroundColor: isToday
+              ? "rgba(150,10,25,0.7)"
+              : currentSticker === null
+              ? "grey"
+              : "rgba(241, 201, 22,0.5)",
           },
         ]}
         onLongPress={() => {
-          setIsSelected(!isSelected)
+          setIsLongPressed(!isLongPressed);
         }}
+        underlayColor="rgba(150,150,150,0.6)"
       >
-        <Text style={styles.day}>{props.day}</Text>
+        <>
+          <Text style={styles.day}>{props.day}</Text>
+          {currentSticker && (
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              <MaterialCommunityIcons
+                name={currentSticker}
+                size={30}
+                color="black"
+              />
+            </View>
+          )}
+        </>
       </TouchableHighlight>
+
       <Modal
         transparent={true}
-        visible={isSelected}
+        visible={isLongPressed}
         onRequestClose={() => {
-          setIsSelected(!isSelected)
+          setIsLongPressed(!isLongPressed);
         }}
+        animationType="slide"
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
+            <View style={{ margin: "3%" }}></View>
+            <FlatList
+              style={{
+                width: "100%",
+                marginBottom: 15,
+                backgroundColor: "rgba(115,115,115,1)",
+                padding: 10,
+                borderRadius: 10,
+                paddingRight: 15,
+              }}
+              data={props.stickerList && props.stickerList}
+              renderItem={renderStickerListItem}
+              horizontal
+            />
+            <TextInput
+              style={{
+                height: "60%",
+                width: "80%",
+                borderColor: "black",
+                borderWidth: 1,
+                marginBottom: 10,
+                borderRadius: 10,
+                color: "white",
+                fontFamily: "sans-serif",
+              }}
+            />
             <TouchableHighlight
               style={[styles.button, styles.buttonClose]}
-              onPress={() => setIsSelected(!isSelected)}
+              onPress={() => setIsLongPressed(!isLongPressed)}
+              underlayColor="rgba(150,150,150,0.6)"
             >
-              <Text style={styles.textStyle}>Hide Modal</Text>
+              <MaterialCommunityIcons
+                name="chevron-down"
+                size={20}
+                color="white"
+              />
             </TouchableHighlight>
           </View>
         </View>
       </Modal>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     height: 50,
     width: 42,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: -2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
     margin: 3,
+    zIndex: 0,
   },
   day: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 3,
-    color: 'white',
+    color: "white",
   },
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 22,
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    padding: 5,
+    backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
+    width: 300,
+    height: 400,
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -91,6 +184,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    backgroundColor: "rgba(100,100,100,1)",
   },
   button: {
     borderRadius: 20,
@@ -98,18 +192,14 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonOpen: {
-    backgroundColor: '#F194FF',
+    backgroundColor: "#F194FF",
   },
   buttonClose: {
-    backgroundColor: '#2196F3',
+    backgroundColor: "#2196F3",
   },
   textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-})
+});
