@@ -17,7 +17,6 @@ const months = [
 ];
 
 export const Calendar = ({ stickerList, db }) => {
-  console.log("calendar rerendered");
   const renderMonth = ({ item }) => {
     return (
       <View>

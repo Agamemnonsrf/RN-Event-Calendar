@@ -69,8 +69,6 @@ export default function App() {
   const [showMenu, setShowMenu] = useState(false);
   const [stickerList, setStickerList] = useState([]);
 
-  console.log("why is nothing logging here?");
-
   useEffect(() => {
     if (db) {
       db.transaction((tx) => {

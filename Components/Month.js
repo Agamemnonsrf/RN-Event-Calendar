@@ -20,8 +20,6 @@ const createDayRange = (days) => {
 export const Month = (props) => {
   const days = createDayRange(props.days);
 
-  console.log("month rerendered");
-
   const cellRender = ({ item }) => {
     return (
       <View>

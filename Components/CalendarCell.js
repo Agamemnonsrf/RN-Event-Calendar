@@ -24,18 +24,12 @@ export const CalendarCell = (props) => {
     }
   }, []);
 
-  console.log("hello");
-  console.log(`db: ${props.db}`);
   useEffect(() => {
     props.db.transaction((tx) => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS stickerdates (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT, month TEXT, year TEXT, sticker TEXT)",
         null,
-        (txObj, resultSet) => {
-          console.log(
-            `stickerDates create if not exists: ${JSON.stringify(resultSet)}`
-          );
-        },
+        (txObj, resultSet) => {},
         (txObj, error) =>
           console.log(`stickerDates error: ${JSON.stringify(error)}`)
       );
@@ -46,9 +40,6 @@ export const CalendarCell = (props) => {
         "select sticker from stickerdates where day = ? and month = ? and year = ?",
         [props.day, props.monthKey, props.year],
         (txObj, resultSet) => {
-          console.log(
-            `resultSet.rows._array: ${JSON.stringify(resultSet.rows._array)}`
-          );
           if (resultSet.rows._array.length > 0) {
             setCurrentSticker(resultSet.rows._array[0].sticker);
           }
@@ -66,13 +57,7 @@ export const CalendarCell = (props) => {
           tx.executeSql(
             "delete from stickerdates where day = ? and month = ? and year = ?",
             [props.day, props.monthKey, props.year],
-            (txObj, resultSet) => {
-              console.log(
-                `deleted sticker from stickerdates: ${JSON.stringify(
-                  resultSet.rows._array
-                )}`
-              );
-            },
+            (txObj, resultSet) => {},
             (txObj, error) =>
               console.log(
                 `error deleting current sticker: ${JSON.stringify(error)}`
@@ -85,13 +70,7 @@ export const CalendarCell = (props) => {
           tx.executeSql(
             "insert into stickerdates (day, month, year, sticker) values (?, ?, ?, ?)",
             [props.day, props.monthKey, props.year, item],
-            (txObj, resultSet) => {
-              console.log(
-                `inserted sticker to stickerdates: ${JSON.stringify(
-                  resultSet.rows._array
-                )}`
-              );
-            },
+            (txObj, resultSet) => {},
             (txObj, error) =>
               console.log(
                 `error inserting current sticker: ${JSON.stringify(error)}`
@@ -148,7 +127,6 @@ export const CalendarCell = (props) => {
         ]}
         onLongPress={() => {
           setIsLongPressed(!isLongPressed);
-          console.warn("long pressed");
         }}
         onPress={() => {
           console.log("yo");
@@ -194,15 +172,17 @@ export const CalendarCell = (props) => {
               horizontal
             />
             <TextInput
+              multiline
               style={{
                 height: "60%",
                 width: "80%",
-                borderColor: "black",
-                borderWidth: 1,
+                backgroundColor: "rgba(115,115,115,1)",
                 marginBottom: 10,
                 borderRadius: 10,
                 color: "white",
                 fontFamily: "sans-serif",
+                textAlignVertical: "top",
+                padding: 10,
               }}
             />
             <TouchableHighlight
