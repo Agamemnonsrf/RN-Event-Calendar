@@ -24,7 +24,84 @@ export const CalendarCell = (props) => {
     }
   }, []);
 
+  console.log("hello");
+  console.log(`db: ${props.db}`);
+  useEffect(() => {
+    props.db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS stickerdates (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT, month TEXT, year TEXT, sticker TEXT)",
+        null,
+        (txObj, resultSet) => {
+          console.log(
+            `stickerDates create if not exists: ${JSON.stringify(resultSet)}`
+          );
+        },
+        (txObj, error) =>
+          console.log(`stickerDates error: ${JSON.stringify(error)}`)
+      );
+    });
+
+    props.db.transaction((tx) => {
+      tx.executeSql(
+        "select sticker from stickerdates where day = ? and month = ? and year = ?",
+        [props.day, props.monthKey, props.year],
+        (txObj, resultSet) => {
+          console.log(
+            `resultSet.rows._array: ${JSON.stringify(resultSet.rows._array)}`
+          );
+          if (resultSet.rows._array.length > 0) {
+            setCurrentSticker(resultSet.rows._array[0].sticker);
+          }
+        },
+        (txObj, error) =>
+          console.log(`error getting current sticker: ${JSON.stringify(error)}`)
+      );
+    });
+  }, []);
+
   const handleSelectSticker = (item) => {
+    if (props.db) {
+      if (currentSticker === item) {
+        props.db.transaction((tx) => {
+          tx.executeSql(
+            "delete from stickerdates where day = ? and month = ? and year = ?",
+            [props.day, props.monthKey, props.year],
+            (txObj, resultSet) => {
+              console.log(
+                `deleted sticker from stickerdates: ${JSON.stringify(
+                  resultSet.rows._array
+                )}`
+              );
+            },
+            (txObj, error) =>
+              console.log(
+                `error deleting current sticker: ${JSON.stringify(error)}`
+              )
+          );
+        });
+        setCurrentSticker(null);
+      } else {
+        props.db.transaction((tx) => {
+          tx.executeSql(
+            "insert into stickerdates (day, month, year, sticker) values (?, ?, ?, ?)",
+            [props.day, props.monthKey, props.year, item],
+            (txObj, resultSet) => {
+              console.log(
+                `inserted sticker to stickerdates: ${JSON.stringify(
+                  resultSet.rows._array
+                )}`
+              );
+            },
+            (txObj, error) =>
+              console.log(
+                `error inserting current sticker: ${JSON.stringify(error)}`
+              )
+          );
+        });
+        setCurrentSticker(item);
+      }
+    }
+
     currentSticker === item ? setCurrentSticker(null) : setCurrentSticker(item);
     setIsLongPressed(false);
   };
@@ -71,6 +148,10 @@ export const CalendarCell = (props) => {
         ]}
         onLongPress={() => {
           setIsLongPressed(!isLongPressed);
+          console.warn("long pressed");
+        }}
+        onPress={() => {
+          console.log("yo");
         }}
         underlayColor="rgba(150,150,150,0.6)"
       >

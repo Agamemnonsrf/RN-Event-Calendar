@@ -64,10 +64,12 @@ const stickerNames = [
 ];
 
 export default function App() {
-  const [db, setDb] = useState(SQLite.openDatabase("nines.db"));
+  const [db, setDb] = useState(SQLite.openDatabase("tenths.db"));
   const [isLoading, setIsLoading] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
   const [stickerList, setStickerList] = useState([]);
+
+  console.log("why is nothing logging here?");
 
   useEffect(() => {
     if (db) {
@@ -81,7 +83,6 @@ export default function App() {
           (txObj, error) => console.log(`error: ${JSON.stringify(error)}`)
         );
       });
-      console.log(`not completed`);
 
       db.transaction((tx) => {
         tx.executeSql(

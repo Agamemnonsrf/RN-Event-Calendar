@@ -17,10 +17,12 @@ const months = [
 ];
 
 export const Calendar = ({ stickerList, db }) => {
+  console.log("calendar rerendered");
   const renderMonth = ({ item }) => {
     return (
       <View>
         <Month
+          year={2023}
           month={item.month}
           days={item.days}
           monthKey={item.monthKey}
